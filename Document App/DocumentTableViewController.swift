@@ -103,7 +103,7 @@ class DocumentTableViewController: UITableViewController {
         
         for item in items {
             // Vérification que l'item possède le suffix jpg et n'a pas le suffix DS_Store
-            if !item.hasSuffix("DS_Store") && item.hasSuffix(".jpg") {
+            if !item.hasSuffix("DS_Store") && item.hasSuffix(".jpeg") {
                 // Formatage de l'url du document
                 let currentUrl = URL(fileURLWithPath: path + "/" + item)
                 // Récupération des valeurs associées à l'URL
