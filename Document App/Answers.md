@@ -33,3 +33,6 @@ Le raccourci pour commenter la sélection dans Xcode est Cmd + /. En sélectionn
 # Délégation
 # Exercice 1:
 L'intérêt d'une propriété statique en programmation est qu'elle est unique à la classe. S'il y à modification de cette propriété dans le programme, elle sera répercuté dans toute l'application.
+
+# Exercice 2:
+La méthode dequeueReusableCell est importante pour les performances des applications parce qu'elle permet de réutiliser les cellules d'une table view ou d'une collection view au lieu de créer une nouvelle cellule chaque fois qu'une nouvelle ligne doit être affichée.
