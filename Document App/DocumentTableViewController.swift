@@ -137,7 +137,7 @@ class DocumentTableViewController: UITableViewController, QLPreviewControllerDat
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let file = self.documents[indexPath.row]
+        let file = self.documents.filter({$0.section == Sections.allCases[indexPath.section]})[indexPath.row]
         selectedFile = file
         self.instantiateQLPreviewController(withUrl: file.url)
     }
