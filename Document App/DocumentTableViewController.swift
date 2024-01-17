@@ -8,12 +8,27 @@
 import UIKit
 import QuickLook
 
+enum Sections: CaseIterable {
+    case imported
+    case bundle
+    
+    func toString() -> String {
+        switch self{
+        case Sections.imported:
+            return "Imported"
+        case Sections.bundle:
+            return "Bundle"
+        }
+    }
+}
+
 struct DocumentFile : Hashable {
     var title : String
     var size : Int
     var imageName : String? = nil
     var url : URL
     var type : String
+    var section : Sections
     
     /*static var documentFiles : [DocumentFile] = [
         DocumentFile(title: "Document 1", size: 100, imageName: nil, url: URL(string: "https://www.apple.com")!, type: "text/plain"),
@@ -110,15 +125,17 @@ class DocumentTableViewController: UITableViewController, QLPreviewControllerDat
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 1
+        return Sections.allCases.count
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return self.documents.count
+        return self.documents.filter({$0.section == Sections.allCases[section]}).count
     }
 
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return Sections.allCases[section].toString()
+    }
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let file = self.documents[indexPath.row]
         selectedFile = file
@@ -127,7 +144,7 @@ class DocumentTableViewController: UITableViewController, QLPreviewControllerDat
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "DocumentCell", for: indexPath)
-        let documentFile = self.documents[indexPath.row]
+        let documentFile = self.documents.filter({$0.section == Sections.allCases[indexPath.section]})[indexPath.row]
         cell.textLabel?.text = documentFile.title
         cell.detailTextLabel?.text = "Size: \(documentFile.size.formattedSize())"
         return cell
@@ -165,12 +182,19 @@ class DocumentTableViewController: UITableViewController, QLPreviewControllerDat
             if !item.hasSuffix("DS_Store") && (item.hasSuffix(".jpeg") || item.hasSuffix(".JPG")) {
                 let currentUrl = URL(fileURLWithPath: path + "/" + item)
                 let resourcesValues = try! currentUrl.resourceValues(forKeys: [.contentTypeKey, .nameKey, .fileSizeKey])
+                
+                var section = Sections.imported
+                if path == Bundle.main.resourcePath!{
+                    section = Sections.bundle
+                }
+                
                 documentList.append(DocumentFile(
                     title: resourcesValues.name!,
                     size: resourcesValues.fileSize ?? 0,
                     imageName: item,
                     url: currentUrl,
-                    type: resourcesValues.contentType!.description)
+                    type: resourcesValues.contentType!.description,
+                    section: section)
                 )
             }
         }

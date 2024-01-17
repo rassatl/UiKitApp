@@ -58,3 +58,6 @@ Il est préférable d'utiliser un "disclosureIndicator" pour nos cellules car il
 Certain APIs en Objective-C, tels que target-action, acceptent des noms de méthodes ou de propriétés en tant que paramètres, puis utilisent ces noms pour appeler ou accéder dynamiquement aux méthodes ou propriétés. En Swift, vous utilisez les expressions #selector pour représenter ces noms de méthodes ou de propriétés en tant que sélecteurs ou chemins de clés, respectivement.
 Le .add représente l'icon +, qui nous permettra d'ajouter un fichier.
 XCode nous demande de mettre le mot clé "@objc" devant la fonction ciblée par le #selector car cela permet au selector de comprendre que cela fait appel à une ancienne fonction en Objectif-C.
+Oui c'est possible, pour cela il faut faire un tableau de UiButton.
+
+Une instruction `defer` est utilisée pour exécuter du code juste avant de transférer le contrôle du programme en dehors de la portée dans laquelle l'instruction apparaît.
