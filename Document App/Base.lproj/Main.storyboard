@@ -40,9 +40,6 @@
                                         </label>
                                     </subviews>
                                 </tableViewCellContentView>
-                                <connections>
-                                    <segue destination="5oa-Dx-VyD" kind="show" identifier="ShowDocumentSegue" id="1li-n2-sfo"/>
-                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -83,7 +80,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ryan-porter-LjEVyRiY3Y0-unsplash.jpg" translatesAutoresizingMaskIntoConstraints="NO" id="rJW-AM-kIl">
-                                <rect key="frame" x="0.0" y="103" width="393" height="715"/>
+                                <rect key="frame" x="0.0" y="59" width="393" height="759"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Akh-ym-2Vz"/>

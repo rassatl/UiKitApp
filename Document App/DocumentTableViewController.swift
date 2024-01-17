@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import QuickLook
 
 struct DocumentFile {
     var title : String
@@ -14,7 +15,7 @@ struct DocumentFile {
     var url : URL
     var type : String
     
-    static var documentFiles : [DocumentFile] = [
+    /*static var documentFiles : [DocumentFile] = [
         DocumentFile(title: "Document 1", size: 100, imageName: nil, url: URL(string: "https://www.apple.com")!, type: "text/plain"),
             DocumentFile(title: "Document 2", size: 200, imageName: nil, url: URL(string: "https://www.apple.com")!, type: "text/plain"),
             DocumentFile(title: "Document 3", size: 300, imageName: nil, url: URL(string: "https://www.apple.com")!, type: "text/plain"),
@@ -25,7 +26,7 @@ struct DocumentFile {
             DocumentFile(title: "Document 8", size: 800, imageName: nil, url: URL(string: "https://www.apple.com")!, type: "text/plain"),
             DocumentFile(title: "Document 9", size: 900, imageName: nil, url: URL(string: "https://www.apple.com")!, type: "text/plain"),
             DocumentFile(title: "Document 10", size: 1000, imageName: nil, url: URL(string: "https://www.apple.com")!, type: "text/plain"),
-    ]
+    ]*/
 }
 
 extension Int {
@@ -36,20 +37,31 @@ extension Int {
     }
 }
 
-class DocumentTableViewController: UITableViewController {
+class DocumentTableViewController: UITableViewController, QLPreviewControllerDataSource {
+    
+    func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
+        return 1
+    }
+    
+    func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
+        guard var file = selectedFile else {
+            return self.documents[0].url as QLPreviewItem
+        }
+        return file.url as QLPreviewItem
+    }
+    
     var documents: [DocumentFile] = []
-
+    var selectedFile: DocumentFile?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.documents = listFileInBundle()
+        self.title = "📁 Liste des documents"
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
-        
-        self.title = "📁 Liste des documents"
-
     }
 
     // MARK: - Table view data source
@@ -64,17 +76,27 @@ class DocumentTableViewController: UITableViewController {
         return self.documents.count
     }
 
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let file = self.documents[indexPath.row]
+        selectedFile = file
+        self.instantiateQLPreviewController(withUrl: file.url)
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "DocumentCell", for: indexPath)
         let documentFile = self.documents[indexPath.row]
-
         cell.textLabel?.text = documentFile.title
         cell.detailTextLabel?.text = "Size: \(documentFile.size.formattedSize())"
-        
         return cell
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    func instantiateQLPreviewController(withUrl url: URL){
+        let previewController = QLPreviewController()
+        previewController.dataSource = self
+        present(previewController, animated: true, completion: nil)
+    }
+    
+    /*override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard let item = sender as? UITableViewCell else {
             return
         }
@@ -88,7 +110,7 @@ class DocumentTableViewController: UITableViewController {
             }
         }
     }
-    
+    */
     // A mettre dans votre DocumentTableViewController
     func listFileInBundle() -> [DocumentFile] {
         // Initialise la classe de gestion des fichies iOS
@@ -122,13 +144,11 @@ class DocumentTableViewController: UITableViewController {
         return documentListBundle
     }
 
-    /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
-    */
 
     /*
     // Override to support editing the table view.
