@@ -8,7 +8,7 @@
 import UIKit
 import QuickLook
 
-struct DocumentFile {
+struct DocumentFile : Hashable {
     var title : String
     var size : Int
     var imageName : String? = nil
@@ -37,14 +37,48 @@ extension Int {
     }
 }
 
-class DocumentTableViewController: UITableViewController, QLPreviewControllerDataSource {
+class DocumentTableViewController: UITableViewController, QLPreviewControllerDataSource,  UIDocumentPickerDelegate {
     
     func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
         return 1
     }
     
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+
+    }
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
+        dismiss(animated: true)
+
+        guard url.startAccessingSecurityScopedResource() else {
+            return
+        }
+        defer {
+            url.stopAccessingSecurityScopedResource()
+        }
+        copyFileToDocumentsDirectory(fromUrl: url)
+        var setDocuments = Set(self.documents).union(Set(listFileInDirectory(path: url.deletingLastPathComponent().path)))
+        self.documents = Array(setDocuments.sorted(by: {$0.url.absoluteString > $1.url.absoluteString}))
+        
+        tableView.reloadData()
+    }
+    
+    func copyFileToDocumentsDirectory(fromUrl url: URL) {
+        // On récupère le dossier de l'application, dossier où nous avons le droit d'écrire nos fichiers
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        
+        // Nous créons une URL de destination pour le fichier
+        let destinationUrl = documentsDirectory.appendingPathComponent(url.lastPathComponent)
+        
+        do {
+            // Puis nous copions le fichier depuis l'URL source vers l'URL de destination
+            try FileManager.default.copyItem(at: url, to: destinationUrl)
+        } catch {
+            print(error)
+        }
+    }
+    
     func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
-        guard var file = selectedFile else {
+        guard let file = selectedFile else {
             return self.documents[0].url as QLPreviewItem
         }
         return file.url as QLPreviewItem
@@ -55,13 +89,22 @@ class DocumentTableViewController: UITableViewController, QLPreviewControllerDat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.documents = listFileInBundle()
+        self.documents = listFileInDirectory(path: Bundle.main.resourcePath!).sorted(by: {$0.url.absoluteString > $1.url.absoluteString})
         self.title = "📁 Liste des documents"
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self,  action: #selector(addDocument))
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
+    }
+    
+    @objc func addDocument(){
+        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [.jpeg, .png])
+        documentPicker.delegate = self
+        documentPicker.modalPresentationStyle = .overFullScreen
+        
+        present(documentPicker, animated: true)
     }
 
     // MARK: - Table view data source
@@ -111,28 +154,18 @@ class DocumentTableViewController: UITableViewController, QLPreviewControllerDat
         }
     }
     */
-    // A mettre dans votre DocumentTableViewController
-    func listFileInBundle() -> [DocumentFile] {
-        // Initialise la classe de gestion des fichies iOS
+    
+    func listFileInDirectory(path: String) -> [DocumentFile] {
         let fm = FileManager.default
-        // Récupération du chemin d'accès des image de Bundle.main
-        let path = Bundle.main.resourcePath!
-        // Récupération de la liste des items de la directory Bundle.main
         let items = try! fm.contentsOfDirectory(atPath: path)
-        
-        // Initialisation du tableau de retour
-        var documentListBundle = [DocumentFile]()
+        var documentList = [DocumentFile]()
         
         for item in items {
             // Vérification que l'item possède le suffix jpg et n'a pas le suffix DS_Store
-            if !item.hasSuffix("DS_Store") && item.hasSuffix(".jpeg") {
-                // Formatage de l'url du document
+            if !item.hasSuffix("DS_Store") && (item.hasSuffix(".jpeg") || item.hasSuffix(".JPG")) {
                 let currentUrl = URL(fileURLWithPath: path + "/" + item)
-                // Récupération des valeurs associées à l'URL
                 let resourcesValues = try! currentUrl.resourceValues(forKeys: [.contentTypeKey, .nameKey, .fileSizeKey])
-                
-                // Création d'une instance de DocumentFile avec les informations récupérées
-                documentListBundle.append(DocumentFile(
+                documentList.append(DocumentFile(
                     title: resourcesValues.name!,
                     size: resourcesValues.fileSize ?? 0,
                     imageName: item,
@@ -141,7 +174,7 @@ class DocumentTableViewController: UITableViewController, QLPreviewControllerDat
                 )
             }
         }
-        return documentListBundle
+        return documentList
     }
 
     // Override to support conditional editing of the table view.

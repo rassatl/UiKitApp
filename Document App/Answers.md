@@ -39,9 +39,7 @@ La méthode dequeueReusableCell est importante pour les performances des applica
 
 # Ajout de la navigation
 # Exercice 1:
-
 Le rôle du NavigationController est de permet de gérer la navigation entre différentes interfaces utilisateur
-
 La NavigationBar est un composant visuel spécifique qui fait partie de l'interface utilisateur d'une vue contrôlée par un UINavigationController. Le NavigationController, en revanche, est un contrôleur de vue qui gère la navigation entre différentes vues dans l'application, il peut être associé à une NavigationBar pour faciliter la navigation.
 
 # Créer l’écran de détail
@@ -52,4 +50,11 @@ Le segue définit une transition entre de vue controlleurs dans notre storyboard
 Les contraintes pousse les composants à rester dans un certain cadre de style. L'autolayout permet aux composants de s'adapter à son contenant.
 
 
+# QLPreviewController
+# Exercice 1:
+Il est préférable d'utiliser un "disclosureIndicator" pour nos cellules car il plus intuitif pour l'utilisateur que d'appuyer sur la ligne. Cela améliore et surtout rend plus agréable l'expérience utilisateur lors de l'utilisation de l'application.
 
+# Exercice 2:
+Certain APIs en Objective-C, tels que target-action, acceptent des noms de méthodes ou de propriétés en tant que paramètres, puis utilisent ces noms pour appeler ou accéder dynamiquement aux méthodes ou propriétés. En Swift, vous utilisez les expressions #selector pour représenter ces noms de méthodes ou de propriétés en tant que sélecteurs ou chemins de clés, respectivement.
+Le .add représente l'icon +, qui nous permettra d'ajouter un fichier.
+XCode nous demande de mettre le mot clé "@objc" devant la fonction ciblée par le #selector car cela permet au selector de comprendre que cela fait appel à une ancienne fonction en Objectif-C.
