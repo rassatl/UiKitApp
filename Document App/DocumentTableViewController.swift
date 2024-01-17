@@ -37,10 +37,11 @@ extension Int {
 }
 
 class DocumentTableViewController: UITableViewController {
+    var documents: [DocumentFile] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        self.documents = listFileInBundle()
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -60,17 +61,65 @@ class DocumentTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return DocumentFile.documentFiles.count
+        return self.documents.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "DocumentCell", for: indexPath)
-        let documentFile = DocumentFile.documentFiles[indexPath.row]
+        let documentFile = self.documents[indexPath.row]
 
         cell.textLabel?.text = documentFile.title
         cell.detailTextLabel?.text = "Size: \(documentFile.size.formattedSize())"
         
         return cell
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let item = sender as? UITableViewCell else {
+            return
+        }
+        if segue.identifier == "ShowDocumentSegue" {
+            if let indexPath = self.tableView.indexPath(for: item) {
+                let index = indexPath.row
+                let document = documents[index]
+                if let vc = segue.destination as? DocumentViewController {
+                    vc.imageName = document.imageName
+                }
+            }
+        }
+    }
+    
+    // A mettre dans votre DocumentTableViewController
+    func listFileInBundle() -> [DocumentFile] {
+        // Initialise la classe de gestion des fichies iOS
+        let fm = FileManager.default
+        // Récupération du chemin d'accès des image de Bundle.main
+        let path = Bundle.main.resourcePath!
+        // Récupération de la liste des items de la directory Bundle.main
+        let items = try! fm.contentsOfDirectory(atPath: path)
+        
+        // Initialisation du tableau de retour
+        var documentListBundle = [DocumentFile]()
+        
+        for item in items {
+            // Vérification que l'item possède le suffix jpg et n'a pas le suffix DS_Store
+            if !item.hasSuffix("DS_Store") && item.hasSuffix(".jpg") {
+                // Formatage de l'url du document
+                let currentUrl = URL(fileURLWithPath: path + "/" + item)
+                // Récupération des valeurs associées à l'URL
+                let resourcesValues = try! currentUrl.resourceValues(forKeys: [.contentTypeKey, .nameKey, .fileSizeKey])
+                
+                // Création d'une instance de DocumentFile avec les informations récupérées
+                documentListBundle.append(DocumentFile(
+                    title: resourcesValues.name!,
+                    size: resourcesValues.fileSize ?? 0,
+                    imageName: item,
+                    url: currentUrl,
+                    type: resourcesValues.contentType!.description)
+                )
+            }
+        }
+        return documentListBundle
     }
 
     /*

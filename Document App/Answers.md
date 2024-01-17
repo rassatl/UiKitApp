@@ -36,3 +36,20 @@ L'intérêt d'une propriété statique en programmation est qu'elle est unique �
 
 # Exercice 2:
 La méthode dequeueReusableCell est importante pour les performances des applications parce qu'elle permet de réutiliser les cellules d'une table view ou d'une collection view au lieu de créer une nouvelle cellule chaque fois qu'une nouvelle ligne doit être affichée.
+
+# Ajout de la navigation
+# Exercice 1:
+
+Le rôle du NavigationController est de permet de gérer la navigation entre différentes interfaces utilisateur
+
+La NavigationBar est un composant visuel spécifique qui fait partie de l'interface utilisateur d'une vue contrôlée par un UINavigationController. Le NavigationController, en revanche, est un contrôleur de vue qui gère la navigation entre différentes vues dans l'application, il peut être associé à une NavigationBar pour faciliter la navigation.
+
+# Créer l’écran de détail
+# Exercice 1:
+Le segue définit une transition entre de vue controlleurs dans notre storyboard
+
+# Exercice 2:
+Les contraintes pousse les composants à rester dans un certain cadre de style. L'autolayout permet aux composants de s'adapter à son contenant.
+
+
+
