@@ -52,7 +52,7 @@ extension Int {
     }
 }
 
-class DocumentTableViewController: UITableViewController, QLPreviewControllerDataSource,  UIDocumentPickerDelegate {
+class DocumentTableViewController: UITableViewController, QLPreviewControllerDataSource,  UIDocumentPickerDelegate, UISearchBarDelegate {
     
     func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
         return 1
@@ -73,7 +73,8 @@ class DocumentTableViewController: UITableViewController, QLPreviewControllerDat
         copyFileToDocumentsDirectory(fromUrl: url)
         var setDocuments = Set(self.documents).union(Set(listFileInDirectory(path: url.deletingLastPathComponent().path)))
         self.documents = Array(setDocuments.sorted(by: {$0.url.absoluteString > $1.url.absoluteString}))
-        
+        filteredData = self.documents
+
         tableView.reloadData()
     }
     
@@ -105,6 +106,7 @@ class DocumentTableViewController: UITableViewController, QLPreviewControllerDat
     override func viewDidLoad() {
         super.viewDidLoad()
         self.documents = listFileInDirectory(path: Bundle.main.resourcePath!).sorted(by: {$0.url.absoluteString > $1.url.absoluteString})
+        filteredData = self.documents
         self.title = "📁 Liste des documents"
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self,  action: #selector(addDocument))
         // Uncomment the following line to preserve selection between presentations
@@ -129,7 +131,7 @@ class DocumentTableViewController: UITableViewController, QLPreviewControllerDat
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.documents.filter({$0.section == Sections.allCases[section]}).count
+        return filteredData.filter({$0.section == Sections.allCases[section]}).count
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -137,14 +139,14 @@ class DocumentTableViewController: UITableViewController, QLPreviewControllerDat
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let file = self.documents.filter({$0.section == Sections.allCases[indexPath.section]})[indexPath.row]
+        let file = filteredData.filter({$0.section == Sections.allCases[indexPath.section]})[indexPath.row]
         selectedFile = file
         self.instantiateQLPreviewController(withUrl: file.url)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "DocumentCell", for: indexPath)
-        let documentFile = self.documents.filter({$0.section == Sections.allCases[indexPath.section]})[indexPath.row]
+        let documentFile = filteredData.filter({$0.section == Sections.allCases[indexPath.section]})[indexPath.row]
         cell.textLabel?.text = documentFile.title
         cell.detailTextLabel?.text = "Size: \(documentFile.size.formattedSize())"
         return cell
@@ -155,22 +157,6 @@ class DocumentTableViewController: UITableViewController, QLPreviewControllerDat
         previewController.dataSource = self
         present(previewController, animated: true, completion: nil)
     }
-    
-    /*override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let item = sender as? UITableViewCell else {
-            return
-        }
-        if segue.identifier == "ShowDocumentSegue" {
-            if let indexPath = self.tableView.indexPath(for: item) {
-                let index = indexPath.row
-                let document = documents[index]
-                if let vc = segue.destination as? DocumentViewController {
-                    vc.imageName = document.imageName
-                }
-            }
-        }
-    }
-    */
     
     func listFileInDirectory(path: String) -> [DocumentFile] {
         let fm = FileManager.default
@@ -206,6 +192,18 @@ class DocumentTableViewController: UITableViewController, QLPreviewControllerDat
         // Return false if you do not want the specified item to be editable.
         return true
     }
+    
+    @IBOutlet weak var searchBar: UISearchBar!
+    var filteredData: [DocumentFile]!
+
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        filteredData = searchText.isEmpty ? self.documents : self.documents.filter { item in
+            return item.title.lowercased().contains(searchText.lowercased())
+        }
+        
+        tableView.reloadData()
+    }
+    
 
     /*
     // Override to support editing the table view.

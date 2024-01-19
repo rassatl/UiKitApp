@@ -16,9 +16,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <searchBar key="tableHeaderView" contentMode="redraw" id="ZCh-PA-iyq">
+                            <rect key="frame" x="0.0" y="0.0" width="393" height="44"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <textInputTraits key="textInputTraits"/>
+                            <connections>
+                                <outlet property="delegate" destination="XYX-6S-7Mh" id="qJf-Z0-n2d"/>
+                            </connections>
+                        </searchBar>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="DocumentCell" textLabel="KF7-gu-oob" detailTextLabel="dVx-iu-i3r" style="IBUITableViewCellStyleSubtitle" id="IHc-Uj-lee">
-                                <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                <rect key="frame" x="0.0" y="94" width="393" height="43.666667938232422"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="IHc-Uj-lee" id="Wfs-TR-fe7">
                                     <rect key="frame" x="0.0" y="0.0" width="362.66666666666669" height="43.666667938232422"/>
@@ -48,6 +56,9 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="ocE-AR-GjF"/>
+                    <connections>
+                        <outlet property="searchBar" destination="ZCh-PA-iyq" id="WQd-Cb-ETS"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="84i-6f-GNw" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
